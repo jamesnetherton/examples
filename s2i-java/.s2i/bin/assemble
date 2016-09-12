@@ -1,0 +1,8 @@
+#!/bin/bash
+set -eo pipefail
+
+# run original assemble script
+/usr/local/s2i/assemble
+
+# Do some customisations
+echo "======================> Starting Customisations"
