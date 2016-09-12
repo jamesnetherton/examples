@@ -27,10 +27,9 @@
     <packaging>pom</packaging>
 
     <name>A set of example applications for various technologies and frameworks</name>
-    <url>http://www.myorganization.org</url>
 
     <modules>
-        <module>wildfly-camel/wildfly-camel-example-custom-module</module>
+        <module>s2i-java</module>
     </modules>
 
 </project>
