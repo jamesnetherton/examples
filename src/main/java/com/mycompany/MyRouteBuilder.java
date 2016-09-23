@@ -36,6 +36,6 @@ public class MyRouteBuilder extends RouteBuilder {
     	from("timer:foo?period=5000")
         .setBody(constant("Kermit"))
         .bean("helloBean")
-        log("Message: ${body}");
+        .log("Message: ${body}");
     }
 }
