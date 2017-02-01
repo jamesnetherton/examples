@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Paths;
 
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.sshd.ClientChannel;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
@@ -87,6 +90,27 @@ public class SSHTest {
             }
 
             client.stop();
+        }
+    }
+
+    @Test
+    public void testCamelSSH() throws Exception {
+        DefaultCamelContext camelContext = new DefaultCamelContext();
+        camelContext.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("direct:start")
+                .to("ssh://admin@localhost:1100?username=admin&password=admin");
+            }
+        });
+
+        camelContext.start();
+        try {
+            ProducerTemplate template = camelContext.createProducerTemplate();
+            String result = template.requestBody("direct:start", "echo Hello Kermit", String.class);
+            Assert.assertEquals("Hello Kermit" + System.lineSeparator(), result);
+        } finally {
+            camelContext.stop();
         }
     }
 }
