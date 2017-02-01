@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import org.apache.sshd.ClientChannel;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
+import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.future.OpenFuture;
 import org.junit.After;
@@ -48,14 +49,23 @@ public class SSHTest {
             }
 
             session = connectFuture.getSession();
-            session.addPasswordIdentity("admin");
-            session.auth().verify();
+
+            AuthFuture authFuture = session.authPassword("admin", "admin");
+            authFuture.await(5000);
+
+            if (!authFuture.isDone() || authFuture.isFailure()) {
+                throw new IllegalStateException("Authentication Failed");
+            }
+
+//            session.addPasswordIdentity("admin");
+//            session.auth().verify();
 
             ByteArrayInputStream in = new ByteArrayInputStream(new byte[]{0});
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ByteArrayOutputStream err = new ByteArrayOutputStream();
 
-            channel = session.createExecChannel("echo Hello Kermit");
+            channel = session.createChannel(ClientChannel.CHANNEL_EXEC, "echo Hello Kermit");
+//            channel = session.createExecChannel("echo Hello Kermit");
             channel.setIn(in);
             channel.setOut(out);
             channel.setErr(err);
