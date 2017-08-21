@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                           http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+
+    <bean id="reportIncidentProcessor" class="com.github.jamesnetherton.example.cxf.incident.ReportIncidentProcessor" />
+    <bean id="statusIncidentProcessor" class="com.github.jamesnetherton.example.cxf.incident.StatusIncidentProcessor" />
+
+    <camelContext xmlns="http://camel.apache.org/schema/spring">
+
+        <!--
+          Route consumes from an CXF WS endpoint and handles the request based on the
+          value of the operationName header
+         -->
+        <route>
+            <from uri="cxf:/incident?serviceClass=com.github.jamesnetherton.example.cxf.incident.IncidentService"/>
+            <to uri="log:input" />
+            <recipientList>
+                <simple>direct:${header.operationName}</simple>
+            </recipientList>
+        </route>
+
+        <route>
+            <from uri="direct:reportIncident"/>
+            <process ref="reportIncidentProcessor"/>
+            <to uri="log:output" />
+        </route>
+
+        <route>
+            <from uri="direct:statusIncident"/>
+            <process ref="statusIncidentProcessor"/>
+            <to uri="log:output" />
+        </route>
+
+    </camelContext>
+
+</beans>
