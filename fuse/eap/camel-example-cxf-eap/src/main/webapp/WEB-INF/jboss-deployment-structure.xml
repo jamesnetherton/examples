@@ -1,8 +1,12 @@
 <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
 
     <deployment>
-        <!-- We don't want EAP to implicitly add its own CXF dependencies to the deployment  -->
+        <!-- Avoid dependencies bundled in the WAR clashing with those already provided by the container -->
         <exclude-subsystems>
+            <!-- We don't want EAP to implicitly add its own Camel dependencies to the deployment  -->
+            <subsystem name="camel"/>
+
+            <!-- We don't want EAP to implicitly add its own CXF dependencies to the deployment  -->
             <subsystem name="webservices"/>
         </exclude-subsystems>
     </deployment>
