@@ -46,12 +46,12 @@ public class DurableSubscriberRouteTest {
     }
 
     @Test
-    public void testDurableSubscriberSuspendResumeStart() throws Exception {
+    public void testDurableSubscriberSuspendResume() throws Exception {
         CamelContext camelContext = createCamelContext();
         camelContext.start();
 
         try {
-            // Stop durable subs
+            // Suspend durable subs
             camelContext.suspendRoute("durable1");
             camelContext.suspendRoute("durable2");
 
@@ -60,13 +60,13 @@ public class DurableSubscriberRouteTest {
             template.sendBodyAndHeader("direct:sendMessageToTopic", "Test Message", "CamelJmsDestinationName", "durableInTopic");
             Thread.sleep(10000);
 
-            // Start durable1
+            // Resume durable1
             MockEndpoint mockEndpoint = camelContext.getEndpoint("mock:durable1", MockEndpoint.class);
             mockEndpoint.expectedBodiesReceived("Reply 1: Test Message");
             camelContext.resumeRoute("durable1");
             mockEndpoint.assertIsSatisfied(10000);
 
-            // Start durable2
+            // Resume durable2
             mockEndpoint = camelContext.getEndpoint("mock:durable2", MockEndpoint.class);
             mockEndpoint.expectedBodiesReceived("Reply 2: Test Message");
             camelContext.resumeRoute("durable2");
